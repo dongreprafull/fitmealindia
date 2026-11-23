@@ -128,4 +128,55 @@ final class FatLoss
         }
         return $rows;
     }
+
+    /**
+     * Server-rendered male-vs-female height/ideal-weight line chart (SVG
+     * markup only, no <svg> wrapper) with an optional highlighted point for
+     * the person's own height/weight. Mirrors the client-side chart drawn by
+     * app.js, but works even before any JavaScript runs.
+     */
+    public static function heightWeightChartSvg(?float $heightCm = null, ?float $weightKg = null, string $gender = 'male', int $minCm = 135, int $maxCm = 200): string
+    {
+        $heights = [];
+        for ($h = $minCm; $h <= $maxCm; $h += 5) $heights[] = $h;
+
+        $male = array_map(fn($h) => self::idealBodyWeight((float) $h, 'male'), $heights);
+        $female = array_map(fn($h) => self::idealBodyWeight((float) $h, 'female'), $heights);
+        $all = array_merge($male, $female, $weightKg !== null ? [$weightKg] : []);
+        $minW = min($all) - 5;
+        $maxW = max($all) + 5;
+
+        $padL = 42; $padR = 14; $padT = 14; $padB = 30;
+        $w = 460; $h = 300;
+        $plotW = $w - $padL - $padR; $plotH = $h - $padT - $padB;
+        $x = fn($hgt) => $padL + (($hgt - $minCm) / ($maxCm - $minCm)) * $plotW;
+        $y = fn($kg) => $padT + $plotH - ((($kg - $minW) / ($maxW - $minW)) * $plotH);
+
+        $svg = '';
+        for ($i = 0; $i <= 5; $i++) {
+            $kg = $minW + (($maxW - $minW) / 5) * $i;
+            $yy = round($y($kg), 1);
+            $svg .= sprintf('<line x1="%d" x2="%d" y1="%s" y2="%s" stroke="#e2e9e3" stroke-width="1"/>', $padL, $w - $padR, $yy, $yy);
+            $svg .= sprintf('<text x="%d" y="%s" text-anchor="end" font-size="10" fill="#64756d">%d</text>', $padL - 6, round($yy + 4, 1), round($kg));
+        }
+        foreach ([137, 152, 167, 183, 198] as $hgt) {
+            $totalIn = (int) round($hgt / 2.54);
+            $label = intdiv($totalIn, 12) . "'" . ($totalIn % 12) . '"';
+            $svg .= sprintf('<text x="%s" y="%d" text-anchor="middle" font-size="10" fill="#64756d">%s</text>', round($x($hgt), 1), $h - $padB + 16, $label);
+        }
+
+        $path = fn(array $series) => implode(' ', array_map(
+            fn($i, $kg) => ($i === 0 ? 'M' : 'L') . round($x($heights[$i]), 1) . ',' . round($y($kg), 1),
+            array_keys($series), $series
+        ));
+        $svg .= sprintf('<path d="%s" fill="none" stroke="#2f6fb3" stroke-width="2.5"/>', $path($male));
+        $svg .= sprintf('<path d="%s" fill="none" stroke="#c44d7e" stroke-width="2.5"/>', $path($female));
+
+        if ($heightCm !== null && $weightKg !== null) {
+            $svg .= sprintf('<circle cx="%s" cy="%s" r="6" fill="#176b4b" stroke="#fff" stroke-width="2"/>', round($x($heightCm), 1), round($y($weightKg), 1));
+            $idealY = round($y(self::idealBodyWeight($heightCm, $gender)), 1);
+            $svg .= sprintf('<circle cx="%s" cy="%s" r="4" fill="none" stroke="#176b4b" stroke-width="2" stroke-dasharray="2,2"/>', round($x($heightCm), 1), $idealY);
+        }
+        return $svg;
+    }
 }

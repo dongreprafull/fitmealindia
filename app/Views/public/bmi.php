@@ -19,7 +19,7 @@
 
   <div class="plain-card chart-card">
     <h3>Height ke hisaab se healthy weight (Male vs Female)</h3>
-    <svg id="weight-chart" viewBox="0 0 460 300" role="img" aria-label="Height vs ideal weight chart for male and female"></svg>
+    <svg id="weight-chart" viewBox="0 0 460 300" role="img" aria-label="Height vs ideal weight chart for male and female"><?= Fitmeal\Core\FatLoss::heightWeightChartSvg(167.6, 70, 'male') ?></svg>
     <div class="chart-legend">
       <span><i class="dot male"></i> Male ideal weight</span>
       <span><i class="dot female"></i> Female ideal weight</span>
