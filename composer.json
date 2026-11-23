@@ -1,0 +1,8 @@
+{
+  "name": "fitmealindia/platform",
+  "description": "FITMEAL INDIA PHP and MySQL MVP",
+  "type": "project",
+  "require": {"php": ">=8.2", "ext-pdo": "*", "ext-pdo_mysql": "*", "ext-json": "*"},
+  "autoload": {"psr-4": {"Fitmeal\\": "app/"}},
+  "scripts": {"serve": "php -S 127.0.0.1:8000 -t public"}
+}
