@@ -22,7 +22,7 @@ jobs:
           tar -xJf /tmp/fitmealindia-source.tar.xz -C /tmp/fitmeal-source
           cp -a /tmp/fitmeal-source/. .
           rm -rf bootstrap-parts
-          rm -f .github/workflows/bootstrap-import.yml
+          rm -f .github/workflows/php-check.yml
       - name: Check PHP syntax
         shell: bash
         run: |
