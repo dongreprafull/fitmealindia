@@ -1,11 +1,13 @@
 <?php
-use Fitmeal\Controllers\{HomeController,AuthController,AssessmentController,CustomerController,AdminController};
+use Fitmeal\Controllers\{HomeController,AuthController,AssessmentController,CustomerController,AdminController,FreePlanController};
 $router->get('/', [HomeController::class,'index']);
 $router->get('/plans', [HomeController::class,'plans']);
 $router->get('/bmi-calculator', [HomeController::class,'bmi']);
 $router->get('/how-it-works', [HomeController::class,'how']);
 $router->get('/privacy-policy', [HomeController::class,'privacy']);
 $router->get('/terms', [HomeController::class,'terms']);
+$router->get('/free-plan', [FreePlanController::class,'show']);
+$router->post('/free-plan', [FreePlanController::class,'generate']);
 $router->get('/register', [AuthController::class,'register']);
 $router->post('/register', [AuthController::class,'store']);
 $router->get('/login', [AuthController::class,'login']);
@@ -14,4 +16,9 @@ $router->post('/logout', [AuthController::class,'logout']);
 $router->get('/assessment', [AssessmentController::class,'show']);
 $router->post('/assessment', [AssessmentController::class,'store']);
 $router->get('/dashboard', [CustomerController::class,'dashboard']);
+$router->get('/my-plan/{id}', [CustomerController::class,'planDetail']);
 $router->get('/admin', [AdminController::class,'dashboard']);
+$router->get('/admin/users', [AdminController::class,'users']);
+$router->post('/admin/users/{id}/status', [AdminController::class,'updateUserStatus']);
+$router->get('/admin/assessments/{id}', [AdminController::class,'assessmentShow']);
+$router->post('/admin/assessments/{id}/status', [AdminController::class,'updateAssessmentStatus']);
